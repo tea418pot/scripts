@@ -1,7 +1,9 @@
 # Get input from user
 echo "Create a .NET project."
-read -p "Name: " name
+read -p "Project name: " name
+read -p "Author name: " author
 echo "Creating .NET project: $name"
+now=$(date +'%-m/%-d/%Y')
 
 # Create .NET WebApi in the user-given directory
 mkdir ~/dev/Backend
@@ -33,8 +35,8 @@ touch Utilities/Logger.cs
 echo "
 /*
 * Controller.cs
-* Author: Christian Sohns
-* Created on: 1/9/2022
+* Author: $author
+* Created on: $now
 */
 
 using Microsoft.AspNetCore.Mvc;
@@ -63,8 +65,8 @@ public class Controller : ControllerBase
 echo "
 /*
 * Model.cs
-* Author: Christian Sohns
-* Created on: 1/9/2022
+* Author: $author
+* Created on: $now
 */
 
 using Supabase;
@@ -83,8 +85,8 @@ public class Model : SupabaseModel
 echo "
 /*
 * Service.cs
-* Author: Christian Sohns
-* Created on: 1/9/2022
+* Author: $author
+* Created on: $now
 */
 
 using Supabase;
@@ -109,8 +111,8 @@ public class Service
 echo "
 /*
 * Logger.cs
-* Author: Christian Sohns
-* Created on: 3/9/2022
+* Author: $author
+* Created on: $now
 */
 
 namespace $name.Util;
