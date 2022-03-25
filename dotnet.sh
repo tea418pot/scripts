@@ -78,7 +78,7 @@ public class Model : SupabaseModel
   [PrimaryKey(\"id\", false)]
   public int Id { get; set; } = -1;
   [Column(\"database-column\")]
-  public string ColumnValue { get; set; } = "";
+  public string ColumnValue { get; set; } = \"\";
 }" > Models/Model.cs
 echo "
 /*
