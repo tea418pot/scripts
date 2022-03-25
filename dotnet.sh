@@ -1,7 +1,11 @@
+# Define colors
+GREEN="\033[0;32m"
+RESET="\033[0m"
+
 # Get input from user
-echo "Create a .NET project."
+echo "${GREEN}Create a .NET project.${RESET}"
 read -p "Name: " name
-echo "Creating .NET project: $name"
+echo "${GREEN}Creating .NET project: $name${RESET}"
 
 # Create .NET WebApi in the user-given directory
 mkdir ~/dev/Backend
