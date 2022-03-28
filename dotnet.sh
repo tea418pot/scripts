@@ -134,6 +134,68 @@ public class Logger
   }
 }
 " > Utilities/Logger.cs
+echo "
+/*
+* DatabaseService.cs
+* Author: $author
+* Created on: $now
+*/
+
+using Supabase;
+using $name.Util;
+
+namespace $name.Services;
+
+public class DatabaseService
+{
+  public static DatabaseService Instance = new DatabaseService();
+  private static bool hasInstance = false;
+  private static bool setupDone = false;
+  private string? url;
+  private string? key;
+  private Client? client;
+
+  public DatabaseService()
+  {
+    if (hasInstance) return;
+    hasInstance = true;
+  }
+
+  public async void DatabaseSetup()
+  {
+    if (setupDone) return;
+    setupDone = true;
+
+    Logger.Info(\"$name.Services.DatabaseService\", \"Connecting to database...\");
+
+    url = \"<supabase-url>\";
+    key = \"<supabase-key>\";
+
+    await Client.InitializeAsync(url, key);
+    client = Client.Instance;
+  }
+
+  public async Task<T[]> FetchTable<T>() where T : SupabaseModel, new()
+  {
+    SupabaseTable<T> table = client!.From<T>();
+    var data = await table.Select(\"*\").Get();
+    return data.Models.ToArray();
+  }
+
+  public async Task<T[]> FetchTable<T>(string column, string filter) where T : SupabaseModel, new()
+  {
+    SupabaseTable<T> table = client!.From<T>();
+    var data = await table.Filter(column, Postgrest.Constants.Operator.Equals, filter).Get();
+    return data.Models.ToArray();
+  }
+
+  public async void AddRow<T>(T rowData) where T : SupabaseModel, new()
+  {
+    SupabaseTable<T> table = client!.From<T>();
+    await table.Insert(rowData);
+  }
+}
+" > Services/DatabaseService.cs
 
 # Open in VSCode
 code ../$name
