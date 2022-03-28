@@ -197,5 +197,7 @@ public class DatabaseService
 }
 " > Services/DatabaseService.cs
 
+echo "Don't forget to run DatabaseService.Instance.SetupDatabase(); before executing app.Run();"
+
 # Open in VSCode
 code ../$name
