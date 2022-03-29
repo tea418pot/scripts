@@ -111,8 +111,7 @@ public class Service
     }
     hasInstance = true;
   }
-}
-" > Services/Service.cs
+}" > Services/Service.cs
 echo "
 /*
 * Logger.cs
@@ -137,8 +136,7 @@ public class Logger
     var line = $\"[{now}] [ERROR \" + location + \"]: \" + msg;
     Console.WriteLine(line);
   }
-}
-" > Utilities/Logger.cs
+}" > Utilities/Logger.cs
 echo "
 /*
 * DatabaseService.cs
@@ -199,8 +197,40 @@ public class DatabaseService
     SupabaseTable<T> table = client!.From<T>();
     await table.Insert(rowData);
   }
+}" > Services/DatabaseService.cs
+echo "
+using $name.Util;
+using $name.Services;
+
+var builder = WebApplication.CreateBuilder(args);
+var Cors = \"\";
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddCors(options => {
+  options.AddPolicy(name: Cors, _builder => {
+    _builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+  });
+});
+
+var app = builder.Build();
+
+DatabaseService.Instance.DatabaseSetup();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
-" > Services/DatabaseService.cs
+
+app.UseAuthorization();
+app.MapControllers();
+
+Logger.Info(\"Program\", \"Application started\");
+app.Run(\"http://0.0.0.0:$port\");
+Logger.Info(\"Program\", \"Application ended\");
+" > Program.cs
 echo "
 version: '3'
 services:
@@ -210,7 +240,6 @@ services:
     restart: on-failure
     ports: 
     - 0.0.0.0:$port:$port
-
 " > docker-compose.yml
 echo "
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
