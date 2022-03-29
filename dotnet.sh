@@ -213,6 +213,12 @@ services:
 
 " > docker-compose.yml
 echo "
+FROM mcr.microsoft.com/dotnet/aspnet:6.0
+WORKDIR /App
+COPY . /App/
+ENTRYPOINT [\"dotnet\", \"$name.dll\"]
+" > Dockerfile
+echo "
 name: Deploy Backend
 on:
   push:
