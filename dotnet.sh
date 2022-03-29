@@ -2,6 +2,8 @@
 echo "Create a .NET project."
 read -p "Project name: " name
 read -p "Author name: " author
+read -p "Service port: " port
+read -p "Deploy branch: " branch
 echo "Creating .NET project: $name"
 now=$(date +'%-m/%-d/%Y')
 
@@ -24,12 +26,15 @@ mkdir Controllers
 mkdir Models
 mkdir Services
 mkdir Utilities
+mkdir .github
+mkdir .github/workflows
 
 # Generate template and static files
 touch Controllers/Controller.cs
 touch Models/Model.cs
 touch Services/Service.cs
 touch Utilities/Logger.cs
+touch .github/workflows/deploy.yml
 
 #Write template code
 echo "
@@ -197,36 +202,58 @@ public class DatabaseService
 }
 " > Services/DatabaseService.cs
 echo "
-/*
-* Program.cs
-* Author: $author
-* Created on: $now
-*/
+version: '3'
+services:
+  $name:
+    build: .
+    container_name: $name
+    restart: on-failure
+    ports: 
+    - 0.0.0.0:$port:$port
 
-using $name.Services;
+" > docker-compose.yml
+echo "
+name: Deploy Backend
+on:
+  push:
+    branches:
+    - $branch
+jobs:
+  build_and_deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    env:
+      PROJECT_ID: '$name'
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Install requirements
+      run: wget -O - https://dotnet.microsoft.com/download/dotnet/scripts/v1/dotnet-install.sh | bash && sudo apt-get install -y rsync
+    - name: Build project
+      run: /home/runner/.dotnet/dotnet build && /home/runner/.dotnet/dotnet publish -c Release && chmod -R 777 /home/runner/work/*
+    - name: Setup Docker requirements
+      run: cp Dockerfile bin/Release/net6.0/publish/Dockerfile && cp docker-compose.yml bin/Release/net6.0/publish/docker-compose.yml
+    - name: Deploy to IONOS
+      uses: easingthemes/ssh-deploy@main
+      env:
+        SSH_PRIVATE_KEY: \${{ secrets.SSH_PRIVATE_KEY }}
+        REMOTE_HOST: \${{ secrets.REMOTE_HOST }}
+        REMOTE_USER: \${{ secrets.REMOTE_USER }}
+        TARGET: '/root/services/\${{ env.PROJECT_ID }}/'
+        SOURCE: 'bin/Release/net6.0/publish/'
+    - name: Rebuild Docker containers
+      uses: appleboy/ssh-action@master
+      with:
+        host: \${{ secrets.REMOTE_HOST }}
+        username: \${{ secrets.REMOTE_USER }}
+        password: \${{ secrets.REMOTE_PASSWORD }}
+        port: \${{ secrets.REMOTE_PORT }}
+        script: 'mkdir -p /root/services/\${{ env.PROJECT_ID }} && cd /root/services/\${{ env.PROJECT_ID }}/ && docker-compose stop && docker-compose build && docker-compose up -d'
+" > .github/workflows/deploy.yml
 
-var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-var app = builder.Build();
-
-DatabaseService.Instance.DatabaseSetup();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-app.UseAuthorization();
-app.MapControllers();
-app.Run();
-" > Program.cs
+# Print info messages
+echo "----- [ INFORMATION ] -----"
+echo "To deploy the application to IONOS with the GitHub Action, add SSH_PRIVATE_KEY, REMOTE_USER, REMOTE_HOST, REMOTE_PASSWORD and REMOTE_PORT to the repository secrets on GitHub."
 
 # Open in VSCode
 code ../$name
