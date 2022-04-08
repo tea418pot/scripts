@@ -36,9 +36,8 @@ touch Services/Service.cs
 touch Utilities/Logger.cs
 touch .github/workflows/deploy.yml
 
-#Write template code
-echo "
-/*
+# Write template code
+echo "/*
 * Controller.cs
 * Author: $author
 * Created on: $now
@@ -67,8 +66,7 @@ public class Controller : ControllerBase
   {
   }
 }" > Controllers/Controller.cs
-echo "
-/*
+echo "/*
 * Model.cs
 * Author: $author
 * Created on: $now
@@ -87,8 +85,7 @@ public class Model : SupabaseModel
   [Column(\"database-column\")]
   public string ColumnValue { get; set; } = \"\";
 }" > Models/Model.cs
-echo "
-/*
+echo "/*
 * Service.cs
 * Author: $author
 * Created on: $now
@@ -112,8 +109,7 @@ public class Service
     hasInstance = true;
   }
 }" > Services/Service.cs
-echo "
-/*
+echo "/*
 * Logger.cs
 * Author: $author
 * Created on: $now
@@ -137,8 +133,7 @@ public class Logger
     Console.WriteLine(line);
   }
 }" > Utilities/Logger.cs
-echo "
-/*
+echo "/*
 * DatabaseService.cs
 * Author: $author
 * Created on: $now
@@ -198,8 +193,7 @@ public class DatabaseService
     await table.Insert(rowData);
   }
 }" > Services/DatabaseService.cs
-echo "
-using $name.Util;
+echo "using $name.Util;
 using $name.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -231,8 +225,7 @@ Logger.Info(\"Program\", \"Application started\");
 app.Run(\"http://0.0.0.0:$port\");
 Logger.Info(\"Program\", \"Application ended\");
 " > Program.cs
-echo "
-version: '3'
+echo "version: '3'
 services:
   $name:
     build: .
@@ -241,14 +234,12 @@ services:
     ports: 
     - 0.0.0.0:$port:$port
 " > docker-compose.yml
-echo "
-FROM mcr.microsoft.com/dotnet/aspnet:6.0
+echo "FROM mcr.microsoft.com/dotnet/aspnet:6.0
 WORKDIR /App
 COPY . /App/
 ENTRYPOINT [\"dotnet\", \"$name.dll\"]
 " > Dockerfile
-echo "
-name: Deploy Backend
+echo "name: Deploy Backend
 on:
   push:
     branches:
