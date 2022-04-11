@@ -5,7 +5,7 @@ read -p "Author name: " author
 read -p "Service port: " port
 read -p "Deploy branch: " branch
 lowerstr=$(echo $name | tr '[:upper:]' '[:lower:]')
-echo "Creating .NET project: $name"
+echo "Creating .NET project: $name ($lowerstr)"
 now=$(date +'%-m/%-d/%Y')
 
 # Create .NET WebApi in the user-given directory
