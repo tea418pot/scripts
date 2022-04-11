@@ -301,7 +301,7 @@ on:
   workflow_dispatch
 jobs:
   restart:
-    name: Restart process
+    name: Changing proxy config
     runs-on: ubuntu-latest
     env:
       PROJECT_ID: '$lowerstr'
@@ -320,7 +320,7 @@ on:
   workflow_dispatch
 jobs:
   restart:
-    name: Restart process
+    name: Changing proxy config
     runs-on: ubuntu-latest
     env:
       PROJECT_ID: '$lowerstr'
