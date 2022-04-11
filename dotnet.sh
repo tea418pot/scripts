@@ -296,6 +296,44 @@ jobs:
         port: \${{ secrets.REMOTE_PORT }}
         script: 'mkdir -p /root/services/\${{ env.PROJECT_ID }} && cd /root/services/\${{ env.PROJECT_ID }}/ && docker-compose stop && docker-compose build && docker-compose up -d'
 " > .github/workflows/restart.yml
+echo "name: Register Proxy Backend
+on:
+  workflow_dispatch
+jobs:
+  restart:
+    name: Restart process
+    runs-on: ubuntu-latest
+    env:
+      PROJECT_ID: '$lowerstr'
+    steps:
+    - name: Rebuild Docker containers
+      uses: appleboy/ssh-action@master
+      with:
+        host: \${{ secrets.REMOTE_HOST }}
+        username: \${{ secrets.REMOTE_USER }}
+        password: \${{ secrets.REMOTE_PASSWORD }}
+        port: \${{ secrets.REMOTE_PORT }}
+        script: 'haproxy-service create \${{ env.PROJECT_ID }} $port'
+" > .github/workflows/register-proxy.yml
+echo "name: Unregister Proxy Backend
+on:
+  workflow_dispatch
+jobs:
+  restart:
+    name: Restart process
+    runs-on: ubuntu-latest
+    env:
+      PROJECT_ID: '$lowerstr'
+    steps:
+    - name: Rebuild Docker containers
+      uses: appleboy/ssh-action@master
+      with:
+        host: \${{ secrets.REMOTE_HOST }}
+        username: \${{ secrets.REMOTE_USER }}
+        password: \${{ secrets.REMOTE_PASSWORD }}
+        port: \${{ secrets.REMOTE_PORT }}
+        script: 'haproxy-service remove \${{ env.PROJECT_ID }}'
+" > .github/workflows/unregister-proxy.yml
 
 # Print info messages
 echo "----- [ INFORMATION ] -----"
