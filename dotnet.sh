@@ -4,6 +4,7 @@ read -p "Project name: " name
 read -p "Author name: " author
 read -p "Service port: " port
 read -p "Deploy branch: " branch
+lowerstr=$(echo $name | tr '[:upper:]' '[:lower:]')
 echo "Creating .NET project: $name"
 now=$(date +'%-m/%-d/%Y')
 
@@ -227,9 +228,9 @@ Logger.Info(\"Program\", \"Application ended\");
 " > Program.cs
 echo "version: '3'
 services:
-  $name:
+  $lowerstr:
     build: .
-    container_name: $name
+    container_name: $lowerstr
     restart: on-failure
     ports: 
     - 0.0.0.0:$port:$port
@@ -249,7 +250,7 @@ jobs:
     name: Build and Deploy
     runs-on: ubuntu-latest
     env:
-      PROJECT_ID: '$name'
+      PROJECT_ID: '$lowerstr'
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
