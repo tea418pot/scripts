@@ -306,14 +306,14 @@ jobs:
     env:
       PROJECT_ID: '$lowerstr'
     steps:
-    - name: Rebuild Docker containers
+    - name: Changing proxy config
       uses: appleboy/ssh-action@master
       with:
         host: \${{ secrets.REMOTE_HOST }}
         username: \${{ secrets.REMOTE_USER }}
         password: \${{ secrets.REMOTE_PASSWORD }}
         port: \${{ secrets.REMOTE_PORT }}
-        script: 'haproxy-service create \${{ env.PROJECT_ID }} $port'
+        script: 'java -jar /root/haproxy-service/haproxy-service.jar create \${{ env.PROJECT_ID }} $port'
 " > .github/workflows/register-proxy.yml
 echo "name: Unregister Proxy Backend
 on:
@@ -325,14 +325,14 @@ jobs:
     env:
       PROJECT_ID: '$lowerstr'
     steps:
-    - name: Rebuild Docker containers
+    - name: Changing proxy config
       uses: appleboy/ssh-action@master
       with:
         host: \${{ secrets.REMOTE_HOST }}
         username: \${{ secrets.REMOTE_USER }}
         password: \${{ secrets.REMOTE_PASSWORD }}
         port: \${{ secrets.REMOTE_PORT }}
-        script: 'haproxy-service remove \${{ env.PROJECT_ID }}'
+        script: 'java -jar /root/haproxy-service/haproxy-service.jar remove \${{ env.PROJECT_ID }}'
 " > .github/workflows/unregister-proxy.yml
 
 # Print info messages
